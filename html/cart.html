@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="mb-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="index.html">
+                <img src="../img/logo.png" alt="Logo" class="logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html">Đăng ký</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.html">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html">Giỏ hàng <span id="cart-count">(0)</span></a>
+                    </li>
+                    <!-- Mục đăng nhập/đăng xuất sẽ được cập nhật trong phần này -->
+                    <li class="nav-item" id="loginSection">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
+                    </li>
+                </ul>
+                <form class="form-inline ml-3">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Đăng nhập</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginUsername">Tên đăng nhập:</label>
+                            <input type="text" id="loginUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Mật khẩu:</label>
+                            <input type="password" id="loginPassword" class="form-control" required>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block" onclick="login()">Đăng nhập</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mt-5 flex-grow-1">
+        <h1 class="text-center">Giỏ hàng</h1>
+        <!-- Danh sách thêm giỏ hàng -->
+        <h2>Danh sách thêm giỏ hàng</h2>
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="added-cart-items"></tbody>
+        </table>
+
+        <!-- Danh sách đặt mua -->
+        <h2>Danh sách đặt mua</h2>
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody id="ordered-cart-items"></tbody>
+        </table>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center bg-dark text-white py-3">
+        <p>&copy; 2024 Công ty Máy In và Máy Scan | Liên hệ: info@mayinmayscan.com</p>
+    </footer>
+
+    <!-- script menu và acc -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateLoginMenu();
+            renderCart();
+        });
+
+        function updateCartCount() {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const cart = JSON.parse(localStorage.getItem(`cart_${currentUser?.username}`)) || [];
+            document.getElementById("cart-count").innerText = `(${cart.length})`;
+        }
+
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        // Thêm tài khoản mẫu
+        if (users.length === 0) {
+            users.push({
+                username: "user1",
+                password: "user123",
+                role: "user"
+            });
+            users.push({
+                username: "admin1",
+                password: "admin123",
+                role: "admin"
+            });
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                localStorage.setItem("currentUser", JSON.stringify(user));
+                updateLoginMenu();
+                updateCartCount();
+                $('#loginModal').modal('hide');
+            } else {
+                alert("Tên đăng nhập hoặc mật khẩu không chính xác");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            updateLoginMenu();
+            document.getElementById("cart-count").innerText = "(0)";
+        }
+
+        function updateLoginMenu() {
+            currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const loginSection = document.getElementById("loginSection");
+
+            if (currentUser) {
+                loginSection.innerHTML = `
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">${currentUser.username}</a>
+                        <div class="dropdown-menu">
+                            ${currentUser.role === "user" ? '<a href="user_info.html" class="dropdown-item">Thông tin người dùng</a>' : ""}
+                            ${currentUser.role === "admin" ? '<a href="admin.html" class="dropdown-item">Quản lý hệ thống</a>' : ""}
+                            <a href="#" class="dropdown-item" onclick="logout()">Đăng xuất</a>
+                        </div>
+                    </div>`;
+                updateCartCount();
+            } else {
+                loginSection.innerHTML = `<a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>`;
+                document.getElementById("cart-count").innerText = "(0)";
+            }
+        }
+    </script>
+
+
+    <script>
+        // Định nghĩa biến lưu tất cả các đơn hàng chung
+        let allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+        let cart = JSON.parse(localStorage.getItem(`cart_${currentUser?.username}`)) || [];
+        let orderedItems = JSON.parse(localStorage.getItem(`orderedItems_${currentUser?.username}`)) || [];
+
+        function renderCart() {
+            const addedCartItems = document.getElementById("added-cart-items");
+            const orderedCartItems = document.getElementById("ordered-cart-items");
+            addedCartItems.innerHTML = "";
+            orderedCartItems.innerHTML = "";
+
+            // Render danh sách thêm giỏ hàng
+            cart.forEach((item, index) => {
+                addedCartItems.innerHTML += `
+                <tr>
+                    <td><img src="${item.image}" alt="Ảnh sản phẩm" width="50"></td>
+                    <td><a href="#" onclick="showProductDetails(${index})">${item.name}</a></td>
+                    <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)"></td>
+                    <td>${(item.price * item.quantity).toLocaleString('vi-VN')} VND</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Xóa</button>
+                        <button class="btn btn-primary btn-sm" onclick="confirmOrder(${index})">Đặt hàng</button>
+                    </td>
+                </tr>`;
+            });
+
+            // Render danh sách đặt mua
+            orderedItems.forEach((item, index) => {
+                orderedCartItems.innerHTML += `
+                <tr>
+                    <td><img src="${item.image}" alt="Ảnh sản phẩm" width="50"></td>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${(item.price * item.quantity).toLocaleString('vi-VN')} VND</td>
+                    <td><span style="color: ${item.statusColor}">${item.status}</span></td>
+                </tr>`;
+            });
+            updateCartCount();
+            saveCartData();
+        }
+
+        function updateQuantity(index, newQuantity) {
+            cart[index].quantity = parseInt(newQuantity, 10);
+            renderCart(); // Cập nhật lại giỏ hàng sau khi thay đổi số lượng
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1); // Xóa sản phẩm khỏi giỏ hàng
+            renderCart(); // Cập nhật lại giao diện
+        }
+
+        function confirmOrder(index) {
+            const confirmMessage = confirm("Xác nhận đặt hàng?");
+            if (confirmMessage) {
+                const item = cart[index];
+                item.status = "Đang chờ xử lý";
+                item.statusColor = "red";
+                item.orderId = Date.now(); // Tạo ID duy nhất cho đơn hàng
+                item.username = currentUser.username; // Gắn tên người dùng
+
+                // Thêm vào danh sách đơn hàng chung
+                allOrders.push(item);
+                orderedItems.push(item); // Thêm vào giỏ hàng đặt mua của người dùng
+                cart.splice(index, 1); // Xóa khỏi giỏ hàng cá nhân
+
+                // Lưu lại dữ liệu
+                localStorage.setItem(`cart_${currentUser.username}`, JSON.stringify(cart));
+                localStorage.setItem("allOrders", JSON.stringify(allOrders));
+                localStorage.setItem(`orderedItems_${currentUser.username}`, JSON.stringify(orderedItems));
+
+                renderCart();
+                updateCartCount();
+            }
+        }
+
+        function saveCartData() {
+            if (currentUser) {
+                localStorage.setItem(`cart_${currentUser.username}`, JSON.stringify(cart));
+                localStorage.setItem(`orderedItems_${currentUser.username}`, JSON.stringify(orderedItems));
+            }
+        }
+
+        function updateCartCount() {
+            document.getElementById("cart-count").innerText = `(${cart.length})`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderCart();
+        });
+
+        function renderCart() {
+            const addedCartItems = document.getElementById("added-cart-items");
+            const orderedCartItems = document.getElementById("ordered-cart-items");
+            addedCartItems.innerHTML = "";
+            orderedCartItems.innerHTML = "";
+
+            // Tải dữ liệu cập nhật từ allOrders
+            const allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+            orderedItems = allOrders.filter(order => order.username === currentUser.username);
+
+            // Render danh sách thêm giỏ hàng
+            cart.forEach((item, index) => {
+                addedCartItems.innerHTML += `
+            <tr>
+                <td><img src="${item.image}" alt="Ảnh sản phẩm" width="50"></td>
+                <td><a href="#" onclick="showProductDetails(${index})">${item.name}</a></td>
+                <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)"></td>
+                <td>${(item.price * item.quantity).toLocaleString('vi-VN')} VND</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Xóa</button>
+                    <button class="btn btn-primary btn-sm" onclick="confirmOrder(${index})">Đặt hàng</button>
+                </td>
+            </tr>`;
+            });
+
+            // Render danh sách đặt mua
+            orderedItems.forEach((item, index) => {
+                orderedCartItems.innerHTML += `
+            <tr>
+                <td><img src="${item.image}" alt="Ảnh sản phẩm" width="50"></td>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${(item.price * item.quantity).toLocaleString('vi-VN')} VND</td>
+                <td><span style="color: ${item.statusColor}">${item.status}</span></td>
+            </tr>`;
+            });
+
+            updateCartCount();
+            saveCartData();
+        }
+    </script>
+
+
+</body>
+
+</html>

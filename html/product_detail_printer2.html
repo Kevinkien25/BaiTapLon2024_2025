@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="mb-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="index.html">
+                <img src="../img/logo.png" alt="Logo" class="logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html">Đăng ký</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.html">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html">Giỏ hàng <span id="cart-count">(0)</span></a>
+                    </li>
+                    <!-- Mục đăng nhập/đăng xuất sẽ được cập nhật trong phần này -->
+                    <li class="nav-item" id="loginSection">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
+                    </li>
+                </ul>
+                <form class="form-inline ml-3">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Đăng nhập</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginUsername">Tên đăng nhập:</label>
+                            <input type="text" id="loginUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Mật khẩu:</label>
+                            <input type="password" id="loginPassword" class="form-control" required>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block" onclick="login()">Đăng nhập</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        <div class="container">
+            <h1 class="mt-5">Chi tiết sản phẩm - Máy in Epson L111O</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="../img/may-in-epson-l1110_printer2.jpg" alt="Máy in B" class="img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h2>Máy in Epson L1110</h2>
+                    <p>Máy in Epson L1110 là một dòng máy in phun tiết kiệm chi phí, được thiết kế đặc biệt cho các nhu cầu in ấn tại nhà và văn phòng nhỏ. Dưới đây là các thông tin chi tiết về sản phẩm:
+                        <br> 1. Thông Số Kỹ Thuật
+                        <br> Loại máy in: Máy in phun màu
+                        <br> Độ phân giải: Lên đến 5760 x 1440 dpi
+                        <br> Tốc độ in:
+                        <br> In màu: Khoảng 10 trang/phút
+                        <br> In đen trắng: Khoảng 33 trang/phút
+                        <br> Khả năng kết nối: Cổng USB 2.0
+                        <br> Dung tích hộp mực: Công nghệ hộp mực rời với dung tích lớn.
+                        <br> 2. Tính Năng Nổi Bật
+                        <br> In với chi phí thấp: Công nghệ tiết kiệm mực giúp giảm chi phí in ấn. Thiết kế nhỏ gọn, hiện đại: Phù hợp cho mọi không gian làm việc. Hiệu suất in ổn định và chất lượng cao: Phù hợp cho tài liệu và ảnh.
+                        <br>
+                    </p>
+                    <p>Giá: 3.000.000 VND</p>
+                    <button class="btn btn-primary" onclick="addToCart('Máy in Epson L111O', '../img/may-in-epson-l1110_printer2.jpg', 3000000)">Thêm vào giỏ hàng</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center bg-dark text-white py-3">
+        <p>&copy; 2024 Công ty Máy In và Máy Scan | Liên hệ: info@mayinmayscan.com</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateCartCount();
+            updateLoginMenu();
+        });
+
+        function updateCartCount() {
+            let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            let cart = JSON.parse(localStorage.getItem(`cart_${currentUser?.username}`)) || [];
+            document.getElementById("cart-count").innerText = `(${cart.length})`;
+        }
+
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        // Thêm tài khoản mẫu
+        if (users.length === 0) {
+            users.push({
+                username: "user1",
+                password: "user123",
+                role: "user"
+            });
+            users.push({
+                username: "admin1",
+                password: "admin123",
+                role: "admin"
+            });
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                localStorage.setItem("currentUser", JSON.stringify(user));
+                updateLoginMenu();
+                $('#loginModal').modal('hide');
+            } else {
+                alert("Tên đăng nhập hoặc mật khẩu không chính xác");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            updateLoginMenu();
+        }
+
+        function updateLoginMenu() {
+            currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const loginSection = document.getElementById("loginSection");
+
+            if (currentUser) {
+                loginSection.innerHTML = `
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">${currentUser.username}</a>
+                        <div class="dropdown-menu">
+                            ${currentUser.role === "user" ? '<a href="user_info.html" class="dropdown-item">Thông tin người dùng</a>' : ""}
+                            ${currentUser.role === "admin" ? '<a href="admin.html" class="dropdown-item">Quản lý hệ thống</a>' : ""}
+                            <a href="#" class="dropdown-item" onclick="logout()">Đăng xuất</a>
+                        </div>
+                    </div>`;
+                updateCartCount();
+            } else {
+                loginSection.innerHTML = `<a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>`;
+                document.getElementById("cart-count").innerText = "(0)";
+            }
+        }
+
+        function addToCart(name, image, price) {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+            if (!currentUser) {
+                alert("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+                $('#loginModal').modal('show');
+                return;
+            }
+
+            let cart = JSON.parse(localStorage.getItem(`cart_${currentUser?.username}`)) || [];
+            cart.push({
+                name,
+                image,
+                price
+            });
+            localStorage.setItem(`cart_${currentUser?.username}`, JSON.stringify(cart));
+            alert("Đã thêm vào giỏ hàng!");
+            updateCartCount();
+        }
+    </script>
+
+</body>
+
+</html>

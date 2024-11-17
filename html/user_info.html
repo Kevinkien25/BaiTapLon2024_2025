@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Người Dùng</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- Header (Tùy chỉnh giống trang chính nếu cần) -->
+    <header class="mb-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="index.html">Trang Chủ</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html">Giỏ hàng <span id="cart-count">(0)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mt-5">
+        <h1 class="text-center">Thông Tin Người Dùng</h1>
+        <form id="userInfoForm" class="mt-4">
+            <div class="form-group">
+                <label for="fullName">Họ tên:</label>
+                <input type="text" id="fullName" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="username">Tên người dùng:</label>
+                <input type="text" id="username" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <div class="input-group">
+                    <input type="password" id="password" class="form-control">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()">👁️</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-block" onclick="updateUserInfo()">Cập nhật thông tin</button>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center bg-dark text-white py-3 mt-5">
+        <p>&copy; 2024 Công ty Máy In và Máy Scan</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadUserInfo();
+        });
+
+        function loadUserInfo() {
+            let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            if (currentUser) {
+                document.getElementById("fullName").value = currentUser.fullName || "";
+                document.getElementById("email").value = currentUser.email || "";
+                document.getElementById("username").value = currentUser.username;
+                document.getElementById("password").value = currentUser.password;
+            } else {
+                alert("Vui lòng đăng nhập để xem thông tin người dùng.");
+                window.location.href = "login.html"; // Điều hướng tới trang đăng nhập nếu không có người dùng hiện tại
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById("password");
+            passwordField.type = passwordField.type === "password" ? "text" : "password";
+        }
+
+        function updateUserInfo() {
+            const newPassword = document.getElementById("password").value;
+            const newFullName = document.getElementById("fullName").value;
+            const newEmail = document.getElementById("email").value;
+
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+            // Cập nhật thông tin người dùng trong danh sách `users`
+            users = users.map(user => {
+                if (user.username === currentUser.username) {
+                    user.password = newPassword;
+                    user.fullName = newFullName;
+                    user.email = newEmail;
+                }
+                return user;
+            });
+
+            // Lưu lại danh sách `users` vào `localStorage`
+            localStorage.setItem("users", JSON.stringify(users));
+
+            // Cập nhật `currentUser` trong `localStorage`
+            currentUser.password = newPassword;
+            currentUser.fullName = newFullName;
+            currentUser.email = newEmail;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+            alert("Cập nhật thông tin thành công!");
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = "index.html"; // Điều hướng về trang chủ sau khi đăng xuất
+        }
+    </script>
+</body>
+
+</html>

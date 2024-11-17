@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <header class="mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Admin Dashboard</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-5">
+        <h1 class="text-center">Quản Lý Tài Khoản và Đơn Hàng</h1>
+        <!-- Quản lý tài khoản người dùng -->
+        <section class="mt-4">
+            <h2>Tài Khoản Người Dùng</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tên người dùng</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    <!-- Hàng sẽ được tạo tự động -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Quản lý đơn hàng -->
+        <section class="mt-5">
+            <h1 class="text-center">Quản lý đơn hàng</h1>
+            <table class="table table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Người đặt</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="text-center bg-dark text-white py-3 mt-5">
+        <p>&copy; 2024 Công ty Máy In và Máy Scan</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadUsers();
+            renderAllOrders();
+        });
+
+        function loadUsers() {
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const userTable = document.getElementById("userTable");
+            userTable.innerHTML = "";
+
+            users.forEach(user => {
+                if (user.username !== "admin") { // Bỏ qua tài khoản admin
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.fullName || ""}</td>
+                        <td>${user.email || ""}</td>
+                        <td>${user.username === currentUser ? "Online" : "Offline"}</td>
+                    `;
+                    userTable.appendChild(row);
+                }
+            });
+        }
+
+        function renderAllOrders() {
+            const orderList = document.getElementById("order-list");
+            orderList.innerHTML = "";
+
+            const allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+
+            allOrders.forEach((order, index) => {
+                orderList.innerHTML += `
+                <tr>
+                    <td><img src="${order.image}" alt="Ảnh sản phẩm" width="50"></td>
+                    <td>${order.name}</td>
+                    <td>${order.quantity}</td>
+                    <td>${(order.price * order.quantity).toLocaleString('vi-VN')} VND</td>
+                    <td>${order.username}</td>
+                    <td><span class="text-${getStatusClass(order.status)}">${order.status || "Chưa cập nhật"}</span></td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="updateOrderStatus(${index}, 'Đơn hàng bị hủy')">Đơn hàng bị hủy</button>
+                            <button class="btn btn-warning btn-sm" onclick="updateOrderStatus(${index}, 'Đang giao hàng')">Đang giao hàng</button>
+                            <button class="btn btn-orange btn-sm" style="background-color: orange; color: white;" onclick="updateOrderStatus(${index}, 'Đơn hàng đã đến')">Đơn hàng đã đến</button>
+                            <button class="btn btn-success btn-sm" onclick="updateOrderStatus(${index}, 'Đã thanh toán')">Đã thanh toán</button>
+                        </td>
+                </tr>`;
+            });
+        }
+
+        // Hàm lấy lớp màu cho trạng thái
+        function getStatusClass(Status) {
+            switch (Status) {
+                case 'Đơn hàng bị hủy':
+                    return 'danger';
+                case 'Đang giao hàng':
+                    return 'warning';
+                case 'Đơn hàng đã đến':
+                    return 'orange';
+                case 'Đã thanh toán':
+                    return 'success';
+                default:
+                    return 'secondary';
+            }
+        }
+
+        function updateOrderStatus(index, Status) {
+            const allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+            allOrders[index].status = Status;
+            localStorage.setItem("allOrders", JSON.stringify(allOrders));
+            renderAllOrders(); // Cập nhật lại bảng
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>
